@@ -9,18 +9,43 @@ from models.place import Place
 from models.review import Review
 
 class FileStorage:
-    def __init__(self, filename):
+    def __init__(self, filename="file.json"):
         self.filename = filename
+        self.__objects = {}
 
-    def save(self, data):
+    def all(self, cls=None):
+        if cls is None:
+            return self.__objects
+        else:
+            return {k: v for k, v in self.__objects.items() if isinstance(v, cls)}
+
+    def new(self, obj):
+        key = "{}.{}".format(obj.__class__.__name__, obj.id)
+        self.__objects[key] = obj
+
+    def save(self):
+        serialized_objects = {}
+        for key, obj in self.__objects.items():
+            serialized_objects[key] = obj.to_dict()
         with open(self.filename, 'w') as file:
-            json.dump(data, file)
+            json.dump(serialized_objects, file)
 
-    def load(self):
+    def reload(self):
         try:
             with open(self.filename, 'r') as file:
                 data = json.load(file)
+                for key, value in data.items():
+                    class_name, obj_id = key.split(".")
+                    cls = eval(class_name)
+                    obj = cls(**value)
+                    self.new(obj)
         except FileNotFoundError:
-            data = {}
-        return data
+            pass
+
+    def delete(self, obj=None):
+        if obj is not None:
+            key = "{}.{}".format(obj.__class__.__name__, obj.id)
+            self.__objects.pop(key, None)
+
+
 
