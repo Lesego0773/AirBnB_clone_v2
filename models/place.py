@@ -3,9 +3,10 @@ from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, Integer, ForeignKey, Float
 from sqlalchemy.orm import relationship
 
+# models/place.py
 class Place(BaseModel, Base):
     __tablename__ = 'places'
-
+    id = Column(String(60), primary_key=True)
     city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
     user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
     name = Column(String(128), nullable=False)
@@ -17,7 +18,6 @@ class Place(BaseModel, Base):
     latitude = Column(Float)
     longitude = Column(Float)
 
-    def __init__(self, storage_type=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if storage_type == 'db':
-            self.reviews = relationship('Review', cascade='all, delete', backref='place')
+    # Defining the relationship unconditionally
+    reviews = relationship('Review', cascade='all, delete', backref='place')
+

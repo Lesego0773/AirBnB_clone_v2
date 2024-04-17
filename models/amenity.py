@@ -3,13 +3,9 @@ from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-class User(BaseModel, Base):
-    __tablename__ = 'users'
+class Amenity(BaseModel, Base):
+    __tablename__ = 'amenities'
 
-    email = Column(String(128), nullable=False)
-    password = Column(String(128), nullable=False)
-    first_name = Column(String(128))
-    last_name = Column(String(128))
-
-    reviews = relationship('Review', cascade='all, delete', backref='user')
+    name = Column(String(128), nullable=False)
+    place_amenities = relationship('Place', secondary='place_amenity', back_populates='amenities')
 
