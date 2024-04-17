@@ -1,13 +1,11 @@
 #!/usr/bin/python3
-from models.base_model import BaseModel
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, String, ForeignKey
 
-class Review(BaseModel):
-    """Review class for the user that inherits from Basemodel"""
+class Review(BaseModel, Base):
+    __tablename__ = 'reviews'
 
-    def __init__(self, *args, **kwargs):
-        """Initializing the review instant"""
-        super().__init__(*args, **kwargs)
+    text = Column(String(1024), nullable=False)
+    place_id = Column(String(60), ForeignKey('places.id'), nullable=False)
+    user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
 
-        self.place_identity = ""
-        self.user_identity = ""
-        self.text = ""

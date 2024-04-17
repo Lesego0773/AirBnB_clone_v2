@@ -1,11 +1,15 @@
 #!/usr/bin/python3
-from models.base_model import BaseModel
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
 
+class User(BaseModel, Base):
+    __tablename__ = 'users'
 
-class Amenity(BaseModel):
-    """Amenity class that inherits from BaseModel"""
+    email = Column(String(128), nullable=False)
+    password = Column(String(128), nullable=False)
+    first_name = Column(String(128))
+    last_name = Column(String(128))
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    reviews = relationship('Review', cascade='all, delete', backref='user')
 
-        self.name = ""

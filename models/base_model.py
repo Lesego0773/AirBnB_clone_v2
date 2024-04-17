@@ -1,41 +1,29 @@
 #!/usr/bin/python3
-import json
-import datetime as dt
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, DateTime
+from datetime import datetime
 import uuid
 
+Base = declarative_base()
+
 class BaseModel:
+    id = Column(String(60), nullable=False, primary_key=True, default=str(uuid.uuid4()))
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+
     def __init__(self, *args, **kwargs):
-        if kwargs:
-            for key, value in kwargs.items():
+        for key, value in kwargs.items():
+            if key != '__class__':
                 setattr(self, key, value)
-        else:
-            self.id = str(uuid.uuid4())
-            self.created_at = dt.datetime.now()
 
     def to_dict(self):
-        return {
-            'id': self.id,
-            'created_at': self.created_at.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+        new_dict = dict(self.__dict__)
+        new_dict.pop('_sa_instance_state', None)
+        new_dict['created_at'] = new_dict['created_at'].isoformat()
+        new_dict['updated_at'] = new_dict['updated_at'].isoformat()
+        return new_dict
 
-        }
-
-    def from_dict(self, data):
-        self.id = data['id']
-        self.created_at = dt.datetime.strptime(data['created_at'], '%Y-%m-%dT%H:%M:%S.%f')
-
-
-    def to_json(self):
-        return json.dumps(self.to_dict())
-
-    def from_json(self, json_str):
-        data = json.loads(json_str)
-        self.from_dict(data)
-
-
-
-
-
-
-
-
+    def delete(self):
+        from models import storage
+        storage.delete(self)
 
