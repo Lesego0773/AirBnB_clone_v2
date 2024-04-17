@@ -2,7 +2,7 @@
 # models/base_model.py
 
 
-
+from models.engine.db_storage import DBStorage
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, DateTime
 from datetime import datetime
