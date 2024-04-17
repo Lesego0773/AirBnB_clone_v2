@@ -1,7 +1,10 @@
 #!/usr/bin/python3
 # models/base_model.py
 
+
+
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, DateTime
 from sqlalchemy import Column, String
 from sqlalchemy import MetaData
 import uuid
