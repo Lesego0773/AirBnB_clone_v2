@@ -12,7 +12,7 @@ from models.amenity import Amenity
 
 class DBStorage:
     __engine = None
-    __session = None
+    __session_maker = None
 
     def __init__(self):
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}:3306/{}'.
@@ -21,12 +21,11 @@ class DBStorage:
                                              getenv('HBNB_MYSQL_HOST'),
                                              getenv('HBNB_MYSQL_DB')),
                                       pool_pre_ping=True)
-
-        if getenv('HBNB_ENV') == 'test':
-            Base.metadata.drop_all(self.__engine)
+        Base.metadata.create_all(self.__engine)
+        self.__session_maker = scoped_session(sessionmaker(bind=self.__engine))
 
     def all(self, cls=None):
-        session = self.__session()
+        session = self.__session_maker()
         objects = {}
         if cls:
             objects = session.query(cls).all()
@@ -37,24 +36,20 @@ class DBStorage:
         return objects
 
     def new(self, obj):
-        session = self.__session()
+        session = self.__session_maker()
         session.add(obj)
         session.commit()
         session.close()
 
     def save(self):
-        session = self.__session()
+        session = self.__session_maker()
         session.commit()
         session.close()
 
     def delete(self, obj=None):
         if obj:
-            session = self.__session()
+            session = self.__session_maker()
             session.delete(obj)
             session.commit()
             session.close()
-
-    def reload(self):
-        Base.metadata.create_all(self.__engine)
-        self.__session = sessionmaker(bind=self.__engine, expire_on_commit=False)
 
