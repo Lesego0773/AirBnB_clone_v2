@@ -1,29 +1,35 @@
 #!/usr/bin/python3
+# models/base_model.py
+
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, DateTime
-from datetime import datetime
+from sqlalchemy import Column, String
+from sqlalchemy import MetaData
 import uuid
 
 Base = declarative_base()
 
 class BaseModel:
-    id = Column(String(60), nullable=False, primary_key=True, default=str(uuid.uuid4()))
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+    id = Column(String(60), primary_key=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     def __init__(self, *args, **kwargs):
-        for key, value in kwargs.items():
-            if key != '__class__':
-                setattr(self, key, value)
+        if kwargs:
+            for key, value in kwargs.items():
+                if key != '__class__':
+                    setattr(self, key, value)
+        else:
+            self.id = str(uuid.uuid4())
 
-    def to_dict(self):
-        new_dict = dict(self.__dict__)
-        new_dict.pop('_sa_instance_state', None)
-        new_dict['created_at'] = new_dict['created_at'].isoformat()
-        new_dict['updated_at'] = new_dict['updated_at'].isoformat()
-        return new_dict
+    def save(self):
+        self.updated_at = datetime.utcnow()
+        storage.save()
 
     def delete(self):
-        from models import storage
         storage.delete(self)
+
+    def to_dict(self):
+        dictionary = self.__dict__.copy()
+        dictionary.pop('_sa_instance_state', None)
+        return dictionary
 
