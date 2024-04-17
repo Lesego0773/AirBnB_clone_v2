@@ -1,13 +1,9 @@
 #!/usr/bin/python3
 # models/base_model.py
 
-
-from models.engine.db_storage import DBStorage
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, DateTime
 from datetime import datetime
-from sqlalchemy import Column, String
-from sqlalchemy import MetaData
 import uuid
 
 Base = declarative_base()
@@ -26,10 +22,15 @@ class BaseModel:
             self.id = str(uuid.uuid4())
 
     def save(self):
+        from models.engine.db_storage import DBStorage  # Import here to avoid circular import
         self.updated_at = datetime.utcnow()
+        storage = DBStorage()  # Initialize storage engine
+        storage.new(self)
         storage.save()
 
     def delete(self):
+        from models.engine.db_storage import DBStorage  # Import here to avoid circular import
+        storage = DBStorage()  # Initialize storage engine
         storage.delete(self)
 
     def to_dict(self):
