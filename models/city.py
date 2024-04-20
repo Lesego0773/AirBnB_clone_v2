@@ -8,6 +8,7 @@ from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 
+
 class City(BaseModel, Base):
     """Representation of city """
     if models.storage_t == "db":
