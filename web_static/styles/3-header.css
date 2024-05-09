@@ -1,0 +1,11 @@
+/*3-header.css */
+
+header {
+    background-color: #FFFFFF;
+    background-image: url("../images/hbnb.png");
+    background-position: left-top;
+    background-repeat: no-repeat;
+    height: 70px;
+    width: 100%;
+    border-bottom: 1px solid #CCCCCC;
+}
